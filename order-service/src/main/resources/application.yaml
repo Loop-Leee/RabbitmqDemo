@@ -1,0 +1,21 @@
+spring:
+  application:
+    name: RabbitmqDemo
+  rabbitmq:
+    host: 127.0.0.1
+    port: 5672
+    username: admin
+    password: 123456
+    virtual-host: /rabbitmq-demo
+    template:
+      retry:
+        enabled: true
+        max-attempts: 3
+        initial-interval: 1000
+        multiplier: 2
+
+server:
+  port: 8081
+
+
+
