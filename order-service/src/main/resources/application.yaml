@@ -13,9 +13,10 @@ spring:
         max-attempts: 3
         initial-interval: 1000
         multiplier: 2
+    publisher-confirm-type: correlated
 
 server:
-  port: 8081
+  port: 8080
 
 
 
