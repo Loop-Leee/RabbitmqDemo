@@ -1,6 +1,5 @@
-package com.lloop.rabbitmq.config;
+package com.lloop.order.config;
 
-import com.lloop.rabbitmq.domain.QueueEnum;
 import org.springframework.amqp.core.*;
 import org.springframework.amqp.rabbit.connection.ConnectionFactory;
 import org.springframework.amqp.rabbit.core.RabbitTemplate;
@@ -42,7 +41,7 @@ public class RabbitMQConfig {
         Map<String, Object> args = new HashMap<>();
         args.put("x-dead-letter-exchange", DLX_EXCHANGE);
         args.put("x-dead-letter-routing-key", DLX_ROUTING_KEY);
-        args.put("x-message-ttl", 1800); // 3分钟
+        args.put("x-message-ttl", 10000); // 10 秒钟
         return new Queue(ORDER_QUEUE, true, false, false, args);
     }
 
