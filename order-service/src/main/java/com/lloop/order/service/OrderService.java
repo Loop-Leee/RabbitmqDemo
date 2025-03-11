@@ -1,7 +1,8 @@
-package com.lloop.rabbitmq.service;
+package com.lloop.order.service;
 
-import com.lloop.rabbitmq.config.RabbitMQConfig;
-import com.lloop.rabbitmq.domain.Order;
+
+import com.lloop.order.config.RabbitMQConfig;
+import com.lloop.order.domain.UserOrder;
 import org.springframework.amqp.rabbit.core.RabbitTemplate;
 import org.springframework.stereotype.Service;
 
@@ -23,12 +24,12 @@ public class OrderService {
 
     public void createOrder(String userId) {
         String orderId = UUID.randomUUID().toString();
-        Order order = new Order(userId, orderId);
-        System.out.println("创建订单:" + order);
+        UserOrder order = new UserOrder(userId, orderId);
+        System.out.println("创建订单:" + order.toString());
         // 发送到交换机
         rabbitTemplate.convertAndSend(
                 RabbitMQConfig.ORDER_EXCHANGE,
-                RabbitMQConfig.ORDER_QUEUE,
+                RabbitMQConfig.ORDER_ROUTING_KEY,
                 order
         );
     }
