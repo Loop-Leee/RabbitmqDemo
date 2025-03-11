@@ -1,7 +1,10 @@
 package com.lloop.rabbitmq.consumer.config;
 
-import com.lloop.rabbitmq.consumer.domain.QueueEnum;
+import org.springframework.amqp.rabbit.config.SimpleRabbitListenerContainerFactory;
+import org.springframework.amqp.rabbit.connection.ConnectionFactory;
 import org.springframework.amqp.core.*;
+import org.springframework.amqp.rabbit.core.RabbitTemplate;
+import org.springframework.amqp.support.converter.Jackson2JsonMessageConverter;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
@@ -12,39 +15,38 @@ import org.springframework.context.annotation.Configuration;
 @Configuration
 public class RabbitmqConfig {
 
-    /**
-     * 创建 hello 交换机
-     * @return hello 交换机
-     */
+    public static final String DLX_EXCHANGE = "order.dlx.exchange";
+    public static final String DLX_QUEUE = "order.dlx.queue";
+    public static final String DLX_ROUTING_KEY = "order.expired";
+
     @Bean
-    public DirectExchange helloDirectExchange() {
-        return ExchangeBuilder
-                .directExchange(QueueEnum.HELLO.getExchange())
-                .durable(true)
-                .build();
+    public DirectExchange dlxExchange() {
+        return new DirectExchange(DLX_EXCHANGE);
     }
 
-    /**
-     * 创建hello队列
-     * @return hello队列
-     */
     @Bean
-    public Queue helloQueue() {
-        return QueueBuilder
-                .durable(QueueEnum.HELLO.getQueue())
-                .build();
+    public Queue dlxQueue() {
+        return new Queue(DLX_QUEUE, true);
     }
 
-    /**
-     * 绑定hello队列到hello交换机
-     * @return Binding 对象
-     */
     @Bean
-    public Binding helloBinding() {
-        return BindingBuilder
-                .bind(helloQueue())
-                .to(helloDirectExchange()).with(QueueEnum.HELLO.getRoutingKey());
+    public Binding dlxBinding() {
+        return new Binding(DLX_QUEUE, Binding.DestinationType.QUEUE, DLX_EXCHANGE, DLX_ROUTING_KEY, null);
     }
 
+    @Bean
+    public RabbitTemplate rabbitTemplate(ConnectionFactory connectionFactory) {
+        RabbitTemplate rabbitTemplate = new RabbitTemplate(connectionFactory);
+        rabbitTemplate.setMessageConverter(new Jackson2JsonMessageConverter()); // 设置 JSON 消息转换
+        return rabbitTemplate;
+    }
+
+    @Bean
+    public SimpleRabbitListenerContainerFactory rabbitListenerContainerFactory(ConnectionFactory connectionFactory) {
+        SimpleRabbitListenerContainerFactory factory = new SimpleRabbitListenerContainerFactory();
+        factory.setConnectionFactory(connectionFactory);
+        factory.setMessageConverter(new Jackson2JsonMessageConverter());
+        return factory;
+    }
 
 }
