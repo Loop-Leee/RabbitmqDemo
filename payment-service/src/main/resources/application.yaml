@@ -15,10 +15,11 @@ spring:
         multiplier: 2
     listener:
       simple:
-        prefetch: 1
+        prefetch: 1               # 每次只读一条信息
+        acknowledge-mode: manual  # 手动确认,确保消息至少被消费一次
 
 server:
-  port: 8080
+  port: 8081
 
 
 
